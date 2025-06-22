@@ -1,0 +1,135 @@
+<?php
+class Member_Model extends CI_Model 
+{
+	
+	private $table = 'member';
+	private $id    = 'id';
+
+	/**
+	 * Constructor
+	 */
+ 
+	
+	// Query for new datatables purpose ;
+	//--------------------------------------------------------------------------------------------------------------------------
+	function dtquery($param)
+	{
+		return $this->db->query("SELECT SQL_CALC_FOUND_ROWS * FROM ".$this->table." left join member_subscribe on subscribe_id_member=id  and subscribe_status='1'
+		$param[where] $param[order] $param[limit]");
+	}
+	
+	function dtfiltered()
+	{
+		$result = $this->db->query('SELECT FOUND_ROWS() as jumlah')->row();
+		
+		return $result->jumlah;
+	}
+	
+	function dtcount()
+	{
+		return $this->db->count_all($this->table);
+	}
+	//--------------------------------------------------------------------------------------------------------------------------
+	
+	
+	function getall()
+	{
+		return $this->db->get($this->table);
+	}
+	
+	function getbyquery($param)
+	{
+		return $this->db->query("SELECT * FROM ".$this->table." $param[where] $param[order] $param[limit]");
+	}
+	
+	function countbyquery($param)
+	{
+		$result = $this->db->query("SELECT COUNT(".$this->id.") as jumlah FROM ".$this->view." $param[where]")->row();
+		
+		if(!empty($result))
+			return $result->jumlah;
+		else
+			return 0;
+	}
+	
+	function countall()
+	{
+		return $this->db->count_all($this->table);
+	}
+	
+	function getby($item)
+	{
+		$this->db->where($item);
+		return $this->db->get($this->table);
+	}
+	
+	function getbyid($id)
+	{
+		$this->db->where($this->id, $id);
+		return $this->db->get($this->table);
+	}
+	
+	function add($item)
+	{
+		$this->db->insert($this->table, $item);
+		return $this->db->insert_id();
+	}
+	
+	function edit($id, $item)
+	{
+		$this->db->where($this->id, $id);
+		return $this->db->update($this->table, $item);
+	}
+	
+	function edit_t_mst_user_login($id, $item)
+	{
+		$this->db->where('C_USERNAME', $id);
+		return $this->db->update('masterdata.t_mst_user_login', $item);
+	}
+	
+	function delete($id)
+	{
+		$this->db->where($this->id, $id);
+		return $this->db->delete($this->table);
+	}
+
+	
+	 
+	function delete_t_mst_user_login($id)
+	{
+		$this->db->where('c_username', $id);
+		return $this->db->delete('masterdata.t_mst_user_login');
+	}
+	
+	
+	function delete_t_mst_pegawai($id)
+	{
+		$this->db->where('c_nip', $id);
+		return $this->db->delete('masterdata.t_mst_pegawai');
+	}
+	
+	
+	function delete_vfs_users($id)
+	{
+		$this->db->where('usr', $id);
+		return $this->db->delete('masterdata.vfs_users');
+	}
+	
+	/**		FOR ADDITONAL FUNCTION
+			Untuk Menambah function baru silahkan letakkan di bawah ini.
+	**/ 
+	
+	function aktivasi($where, $item)
+	{
+		$this->db->where($where);
+		return $this->db->update($this->table, $item);
+	}
+	
+	function getMember($id)
+	{
+		return $this->db->query("SELECT * FROM ".$this->table." m left join masterdata.t_mst_user_login on master_data_user=c_username WHERE m.id = '$id' ");
+	}
+	
+	
+}
+?>
